@@ -9,11 +9,7 @@ on:
     branches: [ "dev" ]
   pull_request:
     branches: [ "dev" ]
- 
-    
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -50,93 +46,6 @@ jobs:
       # linter
       - name : pre-commit hooks
         run: poetry run pre-commit
-      
-  test:
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    # The type of runner that the job will run on
-    runs-on: ${{matrix.os}}
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-      
-      # python
-      - name: Set up python
-        id: setup-python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      # poetry
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-          installer-parallel: true
-      # install dependency
-      - name: install dependency
-        run: poetry install --no-interaction
-        
-      # runing tox
-      - name: Test with tox
-        run: poetry run tox -r
-        env:
-          PLATFORM: ${{matrix.os}}
-      # docker config
-      
-  docker:
-    needs: [build, test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-     # docker
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USER}}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: build docker image
-        run: docker build -t my-image-adisa:$(date +%s) .
-    
-  aws_ECR:
-    needs: [test]
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-      - uses: actions/checkout@v3
-      
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-        
-        
-      - name: Log into AWS ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-      
-      - name: build, tag, and push image to Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry}}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY}}
-          IMAGE_TAG: ${{ github.sha}}
-        run: |
-          docker bulild -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          
-      - name: Log out of AWS ECR
-        if: always()
-        run: docker logout ${{steps.login-ecr.outputs.registry}}
-       
        
       
