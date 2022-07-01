@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "demopro"
+version = "0.1.0"
+description = "This project is a demo which makes use of best practies tools and integration of CI/CD with docker container and images"
+authors = ["AKinsoji Hammed Adisa <harksodje@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+
+[tool.poetry.dev-dependencies]
+Django = "^4.0.5"
+djangorestframework = "^3.13.1"
+pre-commit = "^2.19.0"
+flake8 = "^4.0.1"
+isort = "^5.10.1"
+coverage = "^6.4.1"
+pytest = "^7.1.2"
+tox = "^3.25.0"
+pytest-django = "^4.5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
