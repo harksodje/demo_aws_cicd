@@ -102,7 +102,7 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USER}}
+          username: ${{ secrets.DOCKERHUB_USERNAME}}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: build docker image
         run: docker build -t my-image-adisa:$(date +%s) .
@@ -130,7 +130,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry}}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY}}
-          IMAGE_TAG: demo-image/latest
+          IMAGE_TAG: ${{git.sha}}
         run: |
           docker bulild -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
