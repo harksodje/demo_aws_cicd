@@ -105,7 +105,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME}}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: build docker image
-        run: docker build tag my-image-adisa:$(date +%s) .
+        run: docker build -t my-image-adisa:$(date +%s) .
     
   aws_ECR:
     needs: [test]
@@ -132,7 +132,7 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY}}
           IMAGE_TAG: ${{github.sha-latest}}
         run: |
-          docker bulild -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker bulild tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           
       - name: Log out of AWS ECR
