@@ -105,7 +105,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME}}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: build docker image
-        run: docker build -t my-image-adisa:$(date +%s) .
+        run: docker build tag my-image-adisa:$(date +%s) .
     
   aws_ECR:
     needs: [test]
